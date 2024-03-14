@@ -1,4 +1,4 @@
-package models
+package thirdwebauth
 
 type ThirdwebAuthOptions struct {
 	JwtISS       string

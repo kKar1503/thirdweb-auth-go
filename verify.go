@@ -1,4 +1,4 @@
-package models
+package thirdwebauth
 
 type VerifyOptions struct {
 	Domain        string             `json:"domain,omitempty"`

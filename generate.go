@@ -1,10 +1,6 @@
-package models
+package thirdwebauth
 
-import (
-	"time"
-
-	"github.com/kKar1503/thirdweb-auth-go/internal/globals"
-)
+import "time"
 
 type GenerateOptions struct {
 	Domain         string                   `json:"domain,omitempty"`
@@ -17,6 +13,6 @@ type GenerateOptions struct {
 
 func DefaultGenerateOptions() *GenerateOptions {
 	return &GenerateOptions{
-		ExpirationTime: time.Now().UTC().Add(globals.DefaultTokenDuration),
+		ExpirationTime: time.Now().UTC().Add(DefaultTokenDuration),
 	}
 }

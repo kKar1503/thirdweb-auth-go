@@ -1,10 +1,9 @@
-package models
+package thirdwebauth
 
 import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/kKar1503/thirdweb-auth-go/internal/globals"
 )
 
 type LoginOptions struct {
@@ -22,8 +21,8 @@ type LoginOptions struct {
 
 func DefaultLoginOptions() *LoginOptions {
 	return &LoginOptions{
-		ExpirationTime: time.Now().UTC().Add(globals.DefaultLoginPayloadDuration),
-		InvalidBefore:  time.Now().UTC().Add(-globals.DefaultLoginPayloadDuration),
+		ExpirationTime: time.Now().UTC().Add(DefaultLoginPayloadDuration),
+		InvalidBefore:  time.Now().UTC().Add(-DefaultLoginPayloadDuration),
 	}
 }
 

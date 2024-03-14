@@ -1,4 +1,4 @@
-package interfaces
+package thirdwebauth
 
 type Signer interface {
 	SignMessage(message string) (string, error)

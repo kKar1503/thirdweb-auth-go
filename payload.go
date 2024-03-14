@@ -1,11 +1,10 @@
-package models
+package thirdwebauth
 
 import (
 	"net/http"
 	"time"
 
 	"github.com/kKar1503/thirdweb-auth-go/internal/auth"
-	"github.com/kKar1503/thirdweb-auth-go/internal/interfaces"
 	"github.com/kKar1503/thirdweb-auth-go/internal/models"
 	"github.com/labstack/echo/v4"
 )
@@ -31,7 +30,7 @@ type ThirdwebAuthUser struct {
 
 type ThirdwebAuthConfig struct {
 	Domain              string
-	Verifier            interfaces.SignVerifier
+	Verifier            SignVerifier
 	AuthOptions         ThirdwebAuthConfigAuthOptions
 	CookieOptions       ThirdwebAuthConfigCookieOptions
 	Callbacks           ThirdwebAuthConfigCallbacks
