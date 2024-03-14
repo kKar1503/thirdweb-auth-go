@@ -1,2 +1,3 @@
 # thirdweb-auth-go
-thirdweb Auth SDK written in Go.
+
+ThirdWeb Auth SDK written in Go.
