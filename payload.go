@@ -3,10 +3,6 @@ package thirdwebauth
 import (
 	"net/http"
 	"time"
-
-	"github.com/kKar1503/thirdweb-auth-go/internal/auth"
-	"github.com/kKar1503/thirdweb-auth-go/internal/models"
-	"github.com/labstack/echo/v4"
 )
 
 type PayloadBody struct {
@@ -19,7 +15,7 @@ type ActiveBody struct {
 }
 
 type LoginPayloadBody struct {
-	Payload models.LoginPayload `json:"payload"`
+	Payload LoginPayload `json:"payload"`
 }
 
 type ThirdwebAuthUser struct {
@@ -34,15 +30,7 @@ type ThirdwebAuthConfig struct {
 	AuthOptions         ThirdwebAuthConfigAuthOptions
 	CookieOptions       ThirdwebAuthConfigCookieOptions
 	Callbacks           ThirdwebAuthConfigCallbacks
-	ThirdwebAuthOptions models.ThirdwebAuthOptions
-}
-
-type ThirdwebAuthContext struct {
-	Auth                *auth.ThirdwebAuth
-	AuthOptions         ThirdwebAuthConfigAuthOptions
-	CookieOptions       ThirdwebAuthConfigCookieOptions
-	Callbacks           ThirdwebAuthConfigCallbacks
-	ThirdwebAuthOptions models.ThirdwebAuthOptions
+	ThirdwebAuthOptions ThirdwebAuthOptions
 }
 
 type ThirdwebAuthConfigAuthOptions struct {
@@ -66,8 +54,8 @@ type ThirdwebAuthConfigCookieOptions struct {
 }
 
 type ThirdwebAuthConfigCallbacks struct {
-	OnLogin  func(echo.Context, string) interface{}
-	OnToken  func(echo.Context, string) interface{}
-	OnUser   func(echo.Context, *models.User) interface{}
-	OnLogout func(echo.Context, *models.User)
+	OnLogin  func(*http.Request, string) interface{}
+	OnToken  func(*http.Request, string) interface{}
+	OnUser   func(*http.Request, *User) interface{}
+	OnLogout func(*http.Request, *User)
 }

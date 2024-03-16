@@ -7,8 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kKar1503/thirdweb-auth-go/internal/interfaces"
-	"github.com/kKar1503/thirdweb-auth-go/internal/models"
+	thirdwebauth "github.com/kKar1503/thirdweb-auth-go"
 )
 
 var (
@@ -23,8 +22,8 @@ var (
 
 // Build JWT token based on the authentication payload
 func BuildJWT(
-	signVerifier interfaces.SignVerifier,
-	input *models.AuthenticationPayloadDataInput,
+	signVerifier thirdwebauth.SignVerifier,
+	input *thirdwebauth.AuthenticationPayloadDataInput,
 ) (string, error) {
 	payload := input.ToData()
 
@@ -51,10 +50,10 @@ func BuildJWT(
 
 // Generate a new JWT uing a login payload
 func GenerateJWT(
-	signVerifier interfaces.SignVerifier,
-	payload *models.LoginPayload,
-	options *models.GenerateOptions,
-	clientOptions *models.ThirdwebAuthOptions,
+	signVerifier thirdwebauth.SignVerifier,
+	payload *thirdwebauth.LoginPayload,
+	options *thirdwebauth.GenerateOptions,
+	clientOptions *thirdwebauth.ThirdwebAuthOptions,
 ) (string, error) {
 	verifyOptions := options.VerifyOptions
 	verifyOptions.Domain = options.Domain
@@ -71,7 +70,7 @@ func GenerateJWT(
 		nbf = options.InvalidBefore
 	}
 
-	input := &models.AuthenticationPayloadDataInput{
+	input := &thirdwebauth.AuthenticationPayloadDataInput{
 		ISS: clientOptions.JwtISS,
 		SUB: userAddress,
 		AUD: options.Domain,
@@ -86,7 +85,7 @@ func GenerateJWT(
 }
 
 // Parse data from an encoded auth JWT
-func ParseJWT(jwt string) (*models.AuthenticationPayload, error) {
+func ParseJWT(jwt string) (*thirdwebauth.AuthenticationPayload, error) {
 	parts := strings.Split(jwt, ".")
 	if len(parts) != 3 {
 		return nil, InvalidJWTFormatError
@@ -97,7 +96,7 @@ func ParseJWT(jwt string) (*models.AuthenticationPayload, error) {
 		return nil, err
 	}
 
-	var payload models.AuthenticationPayloadData
+	var payload thirdwebauth.AuthenticationPayloadData
 	err = json.Unmarshal(decodedPayload, &payload)
 	if err != nil {
 		return nil, err
@@ -108,7 +107,7 @@ func ParseJWT(jwt string) (*models.AuthenticationPayload, error) {
 		return nil, err
 	}
 
-	return &models.AuthenticationPayload{
+	return &thirdwebauth.AuthenticationPayload{
 		Payload:   &payload,
 		Signature: string(signature),
 	}, nil
@@ -116,12 +115,12 @@ func ParseJWT(jwt string) (*models.AuthenticationPayload, error) {
 
 // Refresh an existing JWT
 func RefreshJWT(
-	signVerifier interfaces.SignVerifier,
+	signVerifier thirdwebauth.SignVerifier,
 	jwt string,
-	options *models.RefreshOptions,
+	options *thirdwebauth.RefreshOptions,
 ) (string, error) {
 	if options == nil {
-		options = models.DefaultRefreshOptions()
+		options = thirdwebauth.DefaultRefreshOptions()
 	}
 
 	payload, err := ParseJWT(jwt)
@@ -129,7 +128,7 @@ func RefreshJWT(
 		return "", err
 	}
 
-	return BuildJWT(signVerifier, &models.AuthenticationPayloadDataInput{
+	return BuildJWT(signVerifier, &thirdwebauth.AuthenticationPayloadDataInput{
 		ISS: payload.Payload.ISS,
 		SUB: payload.Payload.SUB,
 		AUD: payload.Payload.AUD,
@@ -143,9 +142,9 @@ func RefreshJWT(
 // Validate a JWT and extract the user's info
 func AuthenticateJWT(
 	jwt string,
-	options *models.AuthenticateOptions,
-	clientOptions *models.ThirdwebAuthOptions,
-) (*models.User, error) {
+	options *thirdwebauth.AuthenticateOptions,
+	clientOptions *thirdwebauth.ThirdwebAuthOptions,
+) (*thirdwebauth.User, error) {
 	payload, err := ParseJWT(jwt)
 	if err != nil {
 		return nil, err
@@ -189,7 +188,7 @@ func AuthenticateJWT(
 		return nil, JWTInvalidSignatureError
 	}
 
-	return &models.User{
+	return &thirdwebauth.User{
 		Address: payload.Payload.SUB,
 		Session: payload.Payload.CTX,
 	}, nil

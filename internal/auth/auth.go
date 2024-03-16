@@ -3,34 +3,33 @@ package auth
 import (
 	"time"
 
-	"github.com/kKar1503/thirdweb-auth-go/internal/interfaces"
-	"github.com/kKar1503/thirdweb-auth-go/internal/models"
+	thirdwebauth "github.com/kKar1503/thirdweb-auth-go"
 	"github.com/kKar1503/thirdweb-auth-go/internal/utils"
 )
 
 type ThirdwebAuth struct {
-	domain   string                     // domain of app
-	verifier interfaces.SignVerifier    // used to sign and verify tokens
-	options  models.ThirdwebAuthOptions // options for the auth server
+	domain   string                           // domain of app
+	verifier thirdwebauth.SignVerifier        // used to sign and verify tokens
+	options  thirdwebauth.ThirdwebAuthOptions // options for the auth server
 }
 
-func NewThirdwebAuth(domain string, verifier interfaces.SignVerifier) *ThirdwebAuth {
+func NewThirdwebAuth(domain string, verifier thirdwebauth.SignVerifier) *ThirdwebAuth {
 	return &ThirdwebAuth{
 		domain:   domain,
 		verifier: verifier,
 	}
 }
 
-func (a *ThirdwebAuth) WithOptions(options models.ThirdwebAuthOptions) *ThirdwebAuth {
+func (a *ThirdwebAuth) WithOptions(options thirdwebauth.ThirdwebAuthOptions) *ThirdwebAuth {
 	a.options = options
 	return a
 }
 
 func (a *ThirdwebAuth) Payload(
-	options *models.LoginOptions,
-) *models.LoginPayloadData {
+	options *thirdwebauth.LoginOptions,
+) *thirdwebauth.LoginPayloadData {
 	if options == nil {
-		options = models.DefaultLoginOptions()
+		options = thirdwebauth.DefaultLoginOptions()
 	}
 
 	if options.Domain == "" {
@@ -41,16 +40,16 @@ func (a *ThirdwebAuth) Payload(
 }
 
 func (a *ThirdwebAuth) LoginWithPayload(
-	payload *models.LoginPayloadData,
-) (*models.LoginPayload, error) {
+	payload *thirdwebauth.LoginPayloadData,
+) (*thirdwebauth.LoginPayload, error) {
 	return utils.SignLoginPayload(a.verifier, payload)
 }
 
 func (a *ThirdwebAuth) Login(
-	options *models.LoginOptions,
-) (*models.LoginPayload, error) {
+	options *thirdwebauth.LoginOptions,
+) (*thirdwebauth.LoginPayload, error) {
 	if options == nil {
-		options = models.DefaultLoginOptions()
+		options = thirdwebauth.DefaultLoginOptions()
 	}
 
 	if options.Domain == "" {
@@ -61,11 +60,11 @@ func (a *ThirdwebAuth) Login(
 }
 
 func (a *ThirdwebAuth) Verify(
-	payload *models.LoginPayload,
-	options *models.VerifyOptions,
+	payload *thirdwebauth.LoginPayload,
+	options *thirdwebauth.VerifyOptions,
 ) (string, error) {
 	if options == nil {
-		options = &models.VerifyOptions{
+		options = &thirdwebauth.VerifyOptions{
 			Domain: a.domain,
 		}
 	} else if options.Domain == "" {
@@ -76,11 +75,11 @@ func (a *ThirdwebAuth) Verify(
 }
 
 func (a *ThirdwebAuth) Generate(
-	payload *models.LoginPayload,
-	options *models.GenerateOptions,
+	payload *thirdwebauth.LoginPayload,
+	options *thirdwebauth.GenerateOptions,
 ) (string, error) {
 	if options == nil {
-		options = models.DefaultGenerateOptions()
+		options = thirdwebauth.DefaultGenerateOptions()
 	}
 
 	return utils.GenerateJWT(a.verifier, payload, options, &a.options)
@@ -90,7 +89,7 @@ func (a *ThirdwebAuth) Refresh(
 	jwt string,
 	expirationTime *time.Time,
 ) (string, error) {
-	refreshOptions := models.DefaultRefreshOptions()
+	refreshOptions := thirdwebauth.DefaultRefreshOptions()
 	if expirationTime != nil {
 		refreshOptions.ExpirationTime = *expirationTime
 	}
@@ -100,10 +99,10 @@ func (a *ThirdwebAuth) Refresh(
 
 func (a *ThirdwebAuth) Authenticate(
 	jwt string,
-	options *models.AuthenticateOptions,
-) (*models.User, error) {
+	options *thirdwebauth.AuthenticateOptions,
+) (*thirdwebauth.User, error) {
 	if options == nil {
-		options = &models.AuthenticateOptions{}
+		options = &thirdwebauth.AuthenticateOptions{}
 	}
 
 	if options.Domain == "" {
@@ -113,6 +112,6 @@ func (a *ThirdwebAuth) Authenticate(
 	return utils.AuthenticateJWT(jwt, options, &a.options)
 }
 
-func (a *ThirdwebAuth) ParseToken(jwt string) (*models.AuthenticationPayload, error) {
+func (a *ThirdwebAuth) ParseToken(jwt string) (*thirdwebauth.AuthenticationPayload, error) {
 	return utils.ParseJWT(jwt)
 }

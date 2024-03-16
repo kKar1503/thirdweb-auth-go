@@ -6,8 +6,7 @@ import (
 	"slices"
 	"time"
 
-	"github.com/kKar1503/thirdweb-auth-go/internal/interfaces"
-	"github.com/kKar1503/thirdweb-auth-go/internal/models"
+	thirdwebauth "github.com/kKar1503/thirdweb-auth-go"
 )
 
 const (
@@ -31,7 +30,7 @@ var (
 )
 
 // Create an EIP-4361 & CAIP-122 compliant message to sign based on the login payload
-func CreateLoginMessage(payload *models.LoginPayloadData) string {
+func CreateLoginMessage(payload *thirdwebauth.LoginPayloadData) string {
 	prefix := fmt.Sprintf(headerFormat, payload.Domain, typeField)
 	if payload.Address != "" {
 		prefix += "\n" + payload.Address
@@ -74,8 +73,8 @@ func CreateLoginMessage(payload *models.LoginPayloadData) string {
 	return fullMessage
 }
 
-func BuildLoginPayload(options *models.LoginOptions) *models.LoginPayloadData {
-	payload := models.DefaultLoginPayloadData()
+func BuildLoginPayload(options *thirdwebauth.LoginOptions) *thirdwebauth.LoginPayloadData {
+	payload := thirdwebauth.DefaultLoginPayloadData()
 
 	payload.Domain = options.Domain
 	payload.ChainID = options.ChainID
@@ -110,33 +109,33 @@ func BuildLoginPayload(options *models.LoginOptions) *models.LoginPayloadData {
 }
 
 func SignLoginPayload(
-	signVerifier interfaces.SignVerifier,
-	payload *models.LoginPayloadData,
-) (*models.LoginPayload, error) {
+	signVerifier thirdwebauth.SignVerifier,
+	payload *thirdwebauth.LoginPayloadData,
+) (*thirdwebauth.LoginPayload, error) {
 	message := CreateLoginMessage(payload)
 	signature, err := signVerifier.SignMessage(message)
 	if err != nil {
 		return nil, err
 	}
 
-	return &models.LoginPayload{
+	return &thirdwebauth.LoginPayload{
 		Payload:   payload,
 		Signature: signature,
 	}, nil
 }
 
 func BuildAndSignLoginPayload(
-	signVerifier interfaces.SignVerifier,
-	options *models.LoginOptions,
-) (*models.LoginPayload, error) {
+	signVerifier thirdwebauth.SignVerifier,
+	options *thirdwebauth.LoginOptions,
+) (*thirdwebauth.LoginPayload, error) {
 	payload := BuildLoginPayload(options)
 	return SignLoginPayload(signVerifier, payload)
 }
 
 func VerifyLoginPayload(
-	payload *models.LoginPayload,
-	options *models.VerifyOptions,
-	clientOptions *models.ThirdwebAuthOptions,
+	payload *thirdwebauth.LoginPayload,
+	options *thirdwebauth.VerifyOptions,
+	clientOptions *thirdwebauth.ThirdwebAuthOptions,
 ) (string, error) {
 	if payload.Payload.Domain != options.Domain {
 		return "", PayloadDomainMismatchError
