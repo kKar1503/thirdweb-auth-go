@@ -1,26 +1,27 @@
-package handlers
+package echo
 
 import (
 	"net/http"
 	"time"
 
-	internalModels "github.com/kKar1503/thirdweb-auth-go/internal/models"
-	"github.com/kKar1503/thirdweb-auth-go/models"
+	thirdwebauth "github.com/kKar1503/thirdweb-auth-go"
+	"github.com/kKar1503/thirdweb-auth-go/internal/auth"
+
 	"github.com/labstack/echo/v4"
 )
 
-func PayloadHandler(c echo.Context, authCtx *models.ThirdwebAuthContext) error {
+func payloadHandler(c echo.Context, authCtx *auth.ThirdwebAuthContext) error {
 	if c.Request().Method != "POST" {
 		return c.JSON(http.StatusMethodNotAllowed, map[string]string{"error": "Invalid method. Only POST supported."})
 	}
 
-	payloadBody := &models.PayloadBody{}
+	payloadBody := &thirdwebauth.PayloadBody{}
 	// TODO check on the omitempty binding
 	if err := c.Bind(payloadBody); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Please provide an address"})
 	}
 
-	loginOtpions := &internalModels.LoginOptions{
+	loginOtpions := &thirdwebauth.LoginOptions{
 		Address:   payloadBody.Address,
 		Statement: authCtx.AuthOptions.Statement,
 		URI:       authCtx.AuthOptions.URI,

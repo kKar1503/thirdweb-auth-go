@@ -1,37 +1,35 @@
-package handlers
+package echo
 
 import (
 	"net/http"
 	"time"
 
-	"github.com/kKar1503/thirdweb-auth-go/helpers"
-	"github.com/kKar1503/thirdweb-auth-go/internal/globals"
-	"github.com/kKar1503/thirdweb-auth-go/models"
+	thirdwebauth "github.com/kKar1503/thirdweb-auth-go"
+	"github.com/kKar1503/thirdweb-auth-go/internal/auth"
+	"github.com/kKar1503/thirdweb-auth-go/internal/helpers"
+
 	"github.com/labstack/echo/v4"
 )
 
-func UserHandler(
-	c echo.Context,
-	authCtx *models.ThirdwebAuthContext,
-) error {
+func userHandler(c echo.Context, authCtx *auth.ThirdwebAuthContext) error {
 	if c.Request().Method != "GET" {
 		return c.JSON(http.StatusMethodNotAllowed, map[string]string{"error": "Invalid method. Only GET supported."})
 	}
 
-	user, err := helpers.GetUser(c, authCtx)
+	user, err := helpers.GetUser(c.Request(), authCtx)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
 	if user != nil {
-		token := helpers.GetToken(c)
+		token := helpers.GetToken(c.Request())
 		if token != "" {
 			payload, err := authCtx.Auth.ParseToken(token)
 			if err != nil {
 				return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 			}
 
-			refreshInterval := globals.DefaultRefreshInterval
+			refreshInterval := thirdwebauth.DefaultRefreshInterval
 			if authCtx.AuthOptions.RefreshInterval != 0 {
 				refreshInterval = authCtx.AuthOptions.RefreshInterval
 			}
@@ -53,7 +51,7 @@ func UserHandler(
 				}
 
 				tokenCookie := &http.Cookie{
-					Name:     globals.AuthTokenCookiePrefix + "_" + user.Address,
+					Name:     thirdwebauth.AuthTokenCookiePrefix + "_" + user.Address,
 					Value:    refreshToken,
 					Path:     "/",
 					Expires:  time.Unix(refreshPayload.Payload.EXP, 0),
@@ -76,7 +74,7 @@ func UserHandler(
 				c.SetCookie(tokenCookie)
 
 				activeAccountCookie := &http.Cookie{
-					Name:     globals.AuthActiveAccountCookie,
+					Name:     thirdwebauth.AuthActiveAccountCookie,
 					Value:    user.Address,
 					Path:     "/",
 					Expires:  time.Unix(refreshPayload.Payload.EXP, 0),

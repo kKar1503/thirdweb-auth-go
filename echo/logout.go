@@ -1,34 +1,35 @@
-package handlers
+package echo
 
 import (
 	"net/http"
 	"time"
 
-	"github.com/kKar1503/thirdweb-auth-go/helpers"
-	internalModels "github.com/kKar1503/thirdweb-auth-go/internal/models"
-	"github.com/kKar1503/thirdweb-auth-go/models"
+	thirdwebauth "github.com/kKar1503/thirdweb-auth-go"
+	"github.com/kKar1503/thirdweb-auth-go/internal/auth"
+	"github.com/kKar1503/thirdweb-auth-go/internal/helpers"
+
 	"github.com/labstack/echo/v4"
 )
 
-func LogoutHandler(c echo.Context, authCtx *models.ThirdwebAuthContext) error {
+func logoutHandler(c echo.Context, authCtx *auth.ThirdwebAuthContext) error {
 	if c.Request().Method != "POST" {
 		return c.JSON(http.StatusMethodNotAllowed, map[string]string{"error": "Invalid method. Only POST supported."})
 	}
 
-	activeCookie := helpers.GetActiveCookie(c)
+	activeCookie := helpers.GetActiveCookie(c.Request())
 	if activeCookie == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "No logged in user to logout."})
 	}
 
 	if authCtx.Callbacks.OnLogout != nil {
-		user, err := helpers.GetUser(c, authCtx)
+		user, err := helpers.GetUser(c.Request(), authCtx)
 		if err != nil {
 			return c.JSON(
 				http.StatusInternalServerError,
 				map[string]string{"error": "Failed to get user from request due to: " + err.Error()},
 			)
 		}
-		authCtx.Callbacks.OnLogout(c, &internalModels.User{
+		authCtx.Callbacks.OnLogout(c.Request(), &thirdwebauth.User{
 			Address: user.Address,
 			Session: user.Session,
 		})

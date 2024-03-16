@@ -1,27 +1,27 @@
-package handlers
+package echo
 
 import (
 	"net/http"
 	"time"
 
-	"github.com/kKar1503/thirdweb-auth-go/internal/globals"
-	internalModels "github.com/kKar1503/thirdweb-auth-go/internal/models"
-	"github.com/kKar1503/thirdweb-auth-go/models"
+	thirdwebauth "github.com/kKar1503/thirdweb-auth-go"
+	auth "github.com/kKar1503/thirdweb-auth-go/internal/auth"
+
 	"github.com/labstack/echo/v4"
 )
 
-func LoginHandler(c echo.Context, authCtx *models.ThirdwebAuthContext) (err error) {
+func loginHandler(c echo.Context, authCtx *auth.ThirdwebAuthContext) (err error) {
 	if c.Request().Method != "POST" {
 		return c.JSON(http.StatusMethodNotAllowed, map[string]string{"error": "Invalid method. Only POST supported."})
 	}
 
-	payload := &models.LoginPayloadBody{}
+	payload := &thirdwebauth.LoginPayloadBody{}
 	if err = c.Bind(payload); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid login payload"})
 	}
 
-	generateOptions := &internalModels.GenerateOptions{
-		VerifyOptions: internalModels.VerifyOptions{
+	generateOptions := &thirdwebauth.GenerateOptions{
+		VerifyOptions: thirdwebauth.VerifyOptions{
 			Statement:     authCtx.AuthOptions.Statement,
 			URI:           authCtx.AuthOptions.URI,
 			Version:       authCtx.AuthOptions.Version,
@@ -42,7 +42,7 @@ func LoginHandler(c echo.Context, authCtx *models.ThirdwebAuthContext) (err erro
 	}
 
 	if authCtx.Callbacks.OnToken != nil {
-		authCtx.Callbacks.OnToken(c, token)
+		authCtx.Callbacks.OnToken(c.Request(), token)
 	}
 
 	parsedToken, err := authCtx.Auth.ParseToken(token)
@@ -51,7 +51,7 @@ func LoginHandler(c echo.Context, authCtx *models.ThirdwebAuthContext) (err erro
 	}
 
 	authTokenCookie := &http.Cookie{
-		Name:     globals.AuthTokenCookiePrefix + "_" + payload.Payload.Payload.Address,
+		Name:     thirdwebauth.AuthTokenCookiePrefix + "_" + payload.Payload.Payload.Address,
 		Value:    token,
 		Path:     "/",
 		SameSite: http.SameSiteNoneMode,
@@ -74,7 +74,7 @@ func LoginHandler(c echo.Context, authCtx *models.ThirdwebAuthContext) (err erro
 	c.SetCookie(authTokenCookie)
 
 	activeAccountCookie := &http.Cookie{
-		Name:     globals.AuthActiveAccountCookie,
+		Name:     thirdwebauth.AuthActiveAccountCookie,
 		Value:    payload.Payload.Payload.Address,
 		Path:     "/",
 		SameSite: http.SameSiteNoneMode,
@@ -99,7 +99,7 @@ func LoginHandler(c echo.Context, authCtx *models.ThirdwebAuthContext) (err erro
 	return c.JSON(http.StatusOK, map[string]string{"token": token})
 }
 
-func validateNonce(authCtx *models.ThirdwebAuthContext) func(string) error {
+func validateNonce(authCtx *auth.ThirdwebAuthContext) func(string) error {
 	return func(nonce string) error {
 		if authCtx.AuthOptions.ValidateNonce != nil {
 			return authCtx.AuthOptions.ValidateNonce(nonce)
@@ -109,10 +109,10 @@ func validateNonce(authCtx *models.ThirdwebAuthContext) func(string) error {
 	}
 }
 
-func getSession(c echo.Context, authCtx *models.ThirdwebAuthContext) func(string) interface{} {
+func getSession(c echo.Context, authCtx *auth.ThirdwebAuthContext) func(string) interface{} {
 	return func(address string) interface{} {
 		if authCtx.Callbacks.OnLogin != nil {
-			return authCtx.Callbacks.OnLogin(c, address)
+			return authCtx.Callbacks.OnLogin(c.Request(), address)
 		}
 
 		return nil

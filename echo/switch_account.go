@@ -1,27 +1,28 @@
-package handlers
+package echo
 
 import (
 	"net/http"
 	"time"
 
-	"github.com/kKar1503/thirdweb-auth-go/helpers"
-	"github.com/kKar1503/thirdweb-auth-go/internal/globals"
-	"github.com/kKar1503/thirdweb-auth-go/models"
+	thirdwebauth "github.com/kKar1503/thirdweb-auth-go"
+	"github.com/kKar1503/thirdweb-auth-go/internal/auth"
+	"github.com/kKar1503/thirdweb-auth-go/internal/helpers"
+
 	"github.com/labstack/echo/v4"
 )
 
-func SwitchAccountHandler(c echo.Context, authCtx *models.ThirdwebAuthContext) error {
+func switchAccountHandler(c echo.Context, authCtx *auth.ThirdwebAuthContext) error {
 	if c.Request().Method != "POST" {
 		return c.JSON(http.StatusMethodNotAllowed, map[string]string{"error": "Invalid method. Only POST supported."})
 	}
 
-	activeBody := &models.ActiveBody{}
+	activeBody := &thirdwebauth.ActiveBody{}
 	if err := c.Bind(activeBody); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Please provide an address"})
 	}
 
 	var cookieExpiration time.Time
-	cookie := helpers.GetCookie(c, globals.AuthTokenCookiePrefix+"_"+activeBody.Address)
+	cookie := helpers.GetCookie(c.Request(), thirdwebauth.AuthTokenCookiePrefix+"_"+activeBody.Address)
 	if cookie != "" {
 		parsedToken, err := authCtx.Auth.ParseToken(cookie)
 		if err != nil {
@@ -36,7 +37,7 @@ func SwitchAccountHandler(c echo.Context, authCtx *models.ThirdwebAuthContext) e
 	}
 
 	activeAccountCookie := &http.Cookie{
-		Name:     globals.AuthActiveAccountCookie,
+		Name:     thirdwebauth.AuthActiveAccountCookie,
 		Value:    activeBody.Address,
 		Path:     "/",
 		Expires:  cookieExpiration,
