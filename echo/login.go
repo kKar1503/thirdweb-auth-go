@@ -7,6 +7,7 @@ import (
 	thirdwebauth "github.com/kKar1503/thirdweb-auth-go"
 	auth "github.com/kKar1503/thirdweb-auth-go/internal/auth"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
@@ -17,6 +18,10 @@ func loginHandler(c echo.Context, authCtx *auth.ThirdwebAuthContext) (err error)
 
 	payload := &thirdwebauth.LoginPayloadBody{}
 	if err = c.Bind(payload); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid login payload"})
+	}
+
+	if err := validator.New().Struct(payload); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid login payload"})
 	}
 

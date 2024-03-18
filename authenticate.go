@@ -7,13 +7,13 @@ import (
 )
 
 type AuthenticationPayloadDataInput struct {
-	ISS string      `json:"iss"`
-	SUB string      `json:"sub"`
-	AUD string      `json:"aud"`
-	EXP time.Time   `json:"exp"`
-	NBF time.Time   `json:"nbf"`
-	IAT time.Time   `json:"iat"`
-	JTI string      `json:"jti"`
+	ISS string      `json:"iss" validate:"required"`
+	SUB string      `json:"sub" validate:"required"`
+	AUD string      `json:"aud" validate:"required"`
+	EXP time.Time   `json:"exp" validate:"required"`
+	NBF time.Time   `json:"nbf" validate:"required"`
+	IAT time.Time   `json:"iat" validate:"required"`
+	JTI string      `json:"jti" validate:"required"`
 	CTX interface{} `json:"ctx"`
 }
 
@@ -24,13 +24,13 @@ func DefaultAuthenticationPayloadDataInput() *AuthenticationPayloadDataInput {
 }
 
 type AuthenticationPayloadData struct {
-	ISS string      `json:"iss"`
-	SUB string      `json:"sub"`
-	AUD string      `json:"aud"`
-	EXP int64       `json:"exp"`
-	NBF int64       `json:"nbf"`
-	IAT int64       `json:"iat"`
-	JTI string      `json:"jti"`
+	ISS string      `json:"iss" validate:"required"`
+	SUB string      `json:"sub" validate:"required"`
+	AUD string      `json:"aud" validate:"required"`
+	EXP int64       `json:"exp" validate:"required"`
+	NBF int64       `json:"nbf" validate:"required"`
+	IAT int64       `json:"iat" validate:"required"`
+	JTI string      `json:"jti" validate:"required"`
 	CTX interface{} `json:"ctx"`
 }
 
@@ -48,8 +48,8 @@ func (input *AuthenticationPayloadDataInput) ToData() *AuthenticationPayloadData
 }
 
 type AuthenticationPayload struct {
-	Payload   *AuthenticationPayloadData `json:"payload"`
-	Signature string                     `json:"signature"`
+	Payload   *AuthenticationPayloadData `json:"payload"   validate:"required"`
+	Signature string                     `json:"signature" validate:"required"`
 }
 
 type AuthenticateOptions struct {

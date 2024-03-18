@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	thirdwebauth "github.com/kKar1503/thirdweb-auth-go"
 	"github.com/kKar1503/thirdweb-auth-go/internal/auth"
 
@@ -18,6 +19,10 @@ func payloadHandler(c echo.Context, authCtx *auth.ThirdwebAuthContext) error {
 	payloadBody := &thirdwebauth.PayloadBody{}
 	// TODO check on the omitempty binding
 	if err := c.Bind(payloadBody); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Please provide an address"})
+	}
+
+	if err := validator.New().Struct(payloadBody); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Please provide an address"})
 	}
 

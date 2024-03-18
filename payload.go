@@ -6,20 +6,20 @@ import (
 )
 
 type PayloadBody struct {
-	Address string `json:"address"`
+	Address string `json:"address"           validate:"required"`
 	ChainID string `json:"chainId,omitempty"`
 }
 
 type ActiveBody struct {
-	Address string `json:"address"`
+	Address string `json:"address" validate:"required"`
 }
 
 type LoginPayloadBody struct {
-	Payload LoginPayload `json:"payload"`
+	Payload LoginPayload `json:"payload" validate:"required"`
 }
 
 type ThirdwebAuthUser struct {
-	Address string      `json:"address"`
+	Address string      `json:"address"           validate:"required"`
 	Session interface{} `json:"session,omitempty"`
 	Data    interface{} `json:"data,omitempty"`
 }

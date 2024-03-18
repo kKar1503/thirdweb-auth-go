@@ -27,17 +27,17 @@ func DefaultLoginOptions() *LoginOptions {
 }
 
 type LoginPayloadData struct {
-	Type           string   `json:"type"`
-	Domain         string   `json:"domain"`
-	Address        string   `json:"address"`
-	Statement      string   `json:"statement"`
+	Type           string   `json:"type"                      validate:"required"`
+	Domain         string   `json:"domain"                    validate:"required"`
+	Address        string   `json:"address"                   validate:"required"`
+	Statement      string   `json:"statement"                 validate:"required"`
 	URI            string   `json:"uri,omitempty"`
-	Version        string   `json:"version"`
+	Version        string   `json:"version"                   validate:"required"`
 	ChainID        string   `json:"chain_id,omitempty"`
-	Nonce          string   `json:"nonce"`
-	IssuedAt       string   `json:"issued_at"`
+	Nonce          string   `json:"nonce"                     validate:"required"`
+	IssuedAt       string   `json:"issued_at"                 validate:"required"`
 	ExpirationTime string   `json:"expiration_time,omitempty"`
-	InvalidBefore  string   `json:"invalid_before"`
+	InvalidBefore  string   `json:"invalid_before"            validate:"required"`
 	Resources      []string `json:"resources,omitempty"`
 }
 
@@ -53,11 +53,11 @@ func DefaultLoginPayloadData() *LoginPayloadData {
 }
 
 type LoginPayload struct {
-	Payload   *LoginPayloadData `json:"payload"`
-	Signature string            `json:"signature"`
+	Payload   *LoginPayloadData `json:"payload"   validate:"required"`
+	Signature string            `json:"signature" validate:"required"`
 }
 
 type User struct {
-	Address string      `json:"address"`
+	Address string      `json:"address"           validate:"required"`
 	Session interface{} `json:"session,omitempty"`
 }
