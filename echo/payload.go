@@ -17,7 +17,6 @@ func payloadHandler(c echo.Context, authCtx *auth.ThirdwebAuthContext) error {
 	}
 
 	payloadBody := &thirdwebauth.PayloadBody{}
-	// TODO check on the omitempty binding
 	if err := c.Bind(payloadBody); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Please provide an address"})
 	}
