@@ -11,7 +11,6 @@ import (
 var thirdwebAuthCtx *auth.ThirdwebAuthContext
 
 func InitThirdwebAuth(
-	group *echo.Group,
 	config *thirdwebauth.ThirdwebAuthConfig,
 ) {
 	thirdwebAuthCtx = &auth.ThirdwebAuthContext{
