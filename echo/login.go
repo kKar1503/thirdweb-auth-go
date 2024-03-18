@@ -21,7 +21,9 @@ func loginHandler(c echo.Context, authCtx *auth.ThirdwebAuthContext) (err error)
 	}
 
 	generateOptions := &thirdwebauth.GenerateOptions{
+		Domain: payload.Payload.Payload.Domain,
 		VerifyOptions: thirdwebauth.VerifyOptions{
+			Domain:        payload.Payload.Payload.Domain,
 			Statement:     authCtx.AuthOptions.Statement,
 			URI:           authCtx.AuthOptions.URI,
 			Version:       authCtx.AuthOptions.Version,
